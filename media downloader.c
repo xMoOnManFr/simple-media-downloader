@@ -4,9 +4,7 @@
 #include<time.h>
 
 int main(void){
-    //Startup text
     printf("Welcome to the Media Downloader!\n\n");
-
     char url[256];
 
     //URL checking logic
@@ -40,33 +38,26 @@ int main(void){
     char buffer[80];
 
     //TODO: Write the file to the selected folder (If not bored create the folder/Verify it exist but will need extra imports)
+    //Change this path to save to another folder/If anyone uses this
     char *folder_path = "C:\\Users\\moonman\\Documents\\cat gifs";
     
-    // %d = day, %m = month, %y = 2-digit year
+    // %d = day, %m = month, %y = 2-digit year, %S = seconds, %M = minutes, %H = hours
     strftime(buffer, sizeof(buffer), "%d_%m_%y_%S_%M_%H",t);
-
     
-
-
     //Logic to download as an MP4 
     if(format == 1){
         printf("You selected to download in .MP4\n");
         printf("The download will now start\n");
 
         //Download the video
-        //FIX: the time method only allows for 1 download of each type per day
         snprintf(yt_dlp, sizeof(yt_dlp), "yt-dlp \"%s\" -o \"%s\\video_%s.mp4\"", url, folder_path, buffer);
-        //snprintf(yt_dlp,sizeof(yt_dlp), "yt-dlp \"%s\" -o \"video_%s\%s\"", url,buffer);
         system(yt_dlp);
-
-        //TODO: Open yt-dlp and download file, then write the file to the selected folder
     
     //Logic to download as an mp4 and reencode in GIF with ffmpeg
     }else if(format == 2){
     printf("You selected to download in .GIF\n");
     printf("The download will now start\n");
 
-    // Download the video (use temp_name here, not video_<date>)
     snprintf(yt_dlp, sizeof(yt_dlp), "yt-dlp \"%s\" -o \"%s\\%s.mp4\"", url, folder_path, temp_name);
     system(yt_dlp);
 
@@ -76,9 +67,11 @@ int main(void){
         folder_path, temp_name, folder_path, buffer);
     system(ffmpeg);
 
+
     printf("Download complete\n");
     printf("Deleting temporary file\n");
 
+    //Deleting the temp file needed for the reencoding
     char del_cmd[256];
     snprintf(del_cmd, sizeof(del_cmd), "del \"%s\\%s.mp4\"", folder_path, temp_name);
     system(del_cmd);
