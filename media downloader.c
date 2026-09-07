@@ -21,7 +21,7 @@ int main(void){
     printf("URL successfully registered\n");
 
     printf("In which format do you wish to save your file ?\n");
-    printf("1. mp4\n");
+    printf("1. MP4\n");
     printf("2. GIF\n");
 
     int format; 
@@ -39,10 +39,10 @@ int main(void){
 
     //TODO: Write the file to the selected folder (If not bored create the folder/Verify it exist but will need extra imports)
     //Change this path to save to another folder/If anyone uses this
-    char *folder_path = "C:\\Users\\moonman\\Documents\\cat gifs";
+    char *folder_path = "\%userprofile%\\Downloads";
     
     // %d = day, %m = month, %y = 2-digit year, %S = seconds, %M = minutes, %H = hours
-    strftime(buffer, sizeof(buffer), "%d_%m_%y_%S_%M_%H",t);
+    strftime(buffer, sizeof(buffer), "%d_%m_%y_%H_%M_%S",t);
     
     //Logic to download as an MP4 
     if(format == 1){
@@ -67,7 +67,6 @@ int main(void){
         folder_path, temp_name, folder_path, buffer);
     system(ffmpeg);
 
-
     printf("Download complete\n");
     printf("Deleting temporary file\n");
 
@@ -80,7 +79,7 @@ int main(void){
 }else{
         do{
             printf("Invalid format. Try again.\n");
-            printf("1. mp4\n");
+            printf("1. MP4\n");
             printf("2. GIF\n");
             scanf("%d", &format);
         } while (format != 1 && format != 2);
