@@ -6,4 +6,4 @@ On windows : winget install yt-dlp.yt-dlp | winget install ffmpeg
 
 On linux idk refer to your distro package manager
 
-Same on macos idk how it works
+On macOS idk how it works
