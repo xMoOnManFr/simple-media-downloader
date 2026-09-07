@@ -3,7 +3,6 @@ import subprocess
 import time
 import tkinter
 
-
 def download():
     url = link_input.get()
 
@@ -16,22 +15,13 @@ def download():
 
     subprocess.run(["yt-dlp", "-o", video_temp, url])
 
-    subprocess.run([
-        "ffmpeg",
-        "-i",
-        video_temp,
-        "-vf",
-        "fps=10,scale=480:-1:flags=lanczos,split[s0][s1];[s0]palettegen[p];[s1][p]paletteuse",
-        "-y",
-        gif_sortie,
-    ])
+    subprocess.run(["ffmpeg","-i",video_temp,"-vf","fps=10,scale=480:-1:flags=lanczos,split[s0][s1];[s0]palettegen[p];[s1][p]paletteuse","-y",gif_sortie,])
 
     if os.path.exists(video_temp):
         os.remove(video_temp)
 
     print(f"GIF enregistré : {gif_sortie}")
     os.startfile(destination)
-
 
 root = tkinter.Tk()
 
