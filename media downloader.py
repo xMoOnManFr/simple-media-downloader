@@ -32,10 +32,7 @@ root.configure(background=bg_color)
 root.minsize(600, 300)
 
 tkinter.Label(
-    root,
-    bg="#424449",
-    fg="white",
-    text="Welcome to the media downloader !\n Please input your link below",
+    root,bg="#424449",fg="white",text="Welcome to the media downloader !\n Please input your link below",
 ).pack()
 
 link_input = tkinter.Entry(
