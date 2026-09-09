@@ -3,25 +3,32 @@
 #include<stdlib.h>
 #include<time.h>
 
-char url[128];
+char url[192];
 char *folder_path = "\%userprofile%\\Downloads";
 char yt_dlp_container[192];
 char ffmpeg[256];
 char *buffer;
+char video_name[128];
 
 int generate_time(void){
     time_t now = time(NULL);
     struct tm *t = localtime(&now);
     buffer = malloc(32);
-    if (!buffer) return -1; //Vérification de malloc
-
+    if (!buffer) return -1;
     strftime(buffer, 32, "%d_%m_%y_%H_%M_%S", t);
-    return 0;
+
+    snprintf(video_name, sizeof(video_name),"vid_\%s\"",buffer);
+   return 0;
 }
 
 int yt_dlp(void){
+    //calls the function to actually write in memory
     generate_time();
-    snprintf(yt_dlp_container, sizeof(yt_dlp_container), "yt-dlp \"%s\" -o \"%s\\vid_\%s.mp4\"", url, folder_path, buffer);
+
+    //builds the command
+    snprintf(yt_dlp_container, sizeof(yt_dlp_container), "yt-dlp \"%s\" -o \"%s\\%s.mp4\"", url, folder_path, video_name);
+
+    //executes the command
     system(yt_dlp_container);
 }
 
@@ -53,12 +60,12 @@ int main(void){
     printf("2. GIF\n");
     result = scanf("%d", &format);
 
+    //Checks to catch a char in the buffer
     if (result != 1) {
-        // scanf a échoué : il y a un caractère invalide dans le buffer
         printf("Invalid entry, the input must not be a number .\n");
         int c;
-        while ((c = getchar()) != '\n' && c != EOF); // vider le buffer
-        format = 0; // valeur qui ne matchera ni 1 ni 2, pour reboucler
+        while ((c = getchar()) != '\n' && c != EOF);
+        format = 0;
     }
 } while (format != 1 && format != 2);
 
@@ -83,8 +90,8 @@ int main(void){
     
     // Reencode to GIF, reading from and writing to folder_path
     snprintf(ffmpeg, sizeof(ffmpeg),
-    "ffmpeg -i \"%s\\vid_%s.mp4\" ""-vf \"fps=20,scale=480:-1:flags=lanczos,split[s0][s1];""[s0]palettegen[p];[s1][p]paletteuse\" ""\"%s\\gif_%s.gif\""
-    ,folder_path,buffer,folder_path,buffer);
+    "ffmpeg -i \"%s\\%s.mp4\" ""-vf \"fps=20,scale=480:-1:flags=lanczos,split[s0][s1];""[s0]palettegen[p];[s1][p]paletteuse\" ""\"%s\\gif_%s.gif\""
+    ,folder_path,video_name,folder_path,video_name);
     system(ffmpeg);
 
     printf("Download complete\n");
@@ -92,8 +99,9 @@ int main(void){
 
     //Deleting the temp file needed for the reencoding
     //TODO: Add a check to verify the file is actually deleted before proceeding
-    char del_cmd;
-    snprintf(del_cmd, sizeof(del_cmd), "del \"%s\\vid_%s.mp4\"", folder_path, buffer);
+    //FILE *file = fopen(video_name, "r");
+    char del_cmd[64];
+    snprintf(del_cmd, sizeof(del_cmd), "del \"%s\\%s.mp4\"", folder_path, video_name);
     system(del_cmd);
 
     printf("Temporary file deleted, Exiting program\n");
