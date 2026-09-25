@@ -4,11 +4,10 @@
 #include <time.h>
 
 char url[192];
-char *folder_path = "%USERPROFILE%\\Downloads";  // FIX: removed stray backslash before %
+char *folder_path = "%USERPROFILE%\\Downloads";
 char yt_dlp_container[512];
 char ffmpeg_cmd[512];
 char video_name[128];
-char browser_name[32] = "";  // FIX: stores selected browser, empty = no cookies
 
 int generate_time(void) {
     time_t now = time(NULL);
@@ -26,13 +25,6 @@ int yt_dlp(void) {
     // Build base command
     int len = snprintf(yt_dlp_container, sizeof(yt_dlp_container),
                        "yt-dlp \"%s\" -o \"%s\\%s.mp4\"", url, folder_path, video_name);
-
-    // FIX: append cookies flag if a browser was selected
-    if (browser_name[0] != '\0') {
-        len += snprintf(yt_dlp_container + len, sizeof(yt_dlp_container) - len,
-                        " --cookies-from-browser %s", browser_name);
-    }
-
     system(yt_dlp_container);
     return 0;
 }
@@ -50,29 +42,17 @@ int main(void) {
         }
     } while (strstr(url, "https://") != url);
 
-    int browser = 0;
-    if (strstr(url, "youtube.com") != NULL) {  // FIX: != NULL is clearer than != url
-        printf("It appears you're trying to download a youtube video.\n");
-        printf("However youtube blocks video downloading if it doesn't come from a logged in user.\n");
-        printf("Please select a supported browser in which you are logged in:\n");
-        printf("1. Chrome\n2. Chromium\n3. Brave\n4. Firefox\n5. Opera\n6. Edge\n7. Whale\n");
-
-        // FIX: %d not %t
-        if (scanf("%d", &browser) == 1) {
-            switch (browser) {
-                case 1:  strcpy(browser_name, "chrome");    break;
-                case 2:  strcpy(browser_name, "chromium");  break;
-                case 3:  strcpy(browser_name, "brave");     break;
-                case 4:  strcpy(browser_name, "firefox");   break;
-                case 5:  strcpy(browser_name, "opera");     break;
-                case 6:  strcpy(browser_name, "edge");      break;
-                case 7:  strcpy(browser_name, "whale");     break;
-                default: printf("Invalid selection, no cookies will be used.\n");
-            }
-        }
+    char browser[8];
+    //Add a check for youtube and specify how it works (or not)
+    if(strstr(url, "youtube") != url){
+        printf("\nIt appears you tried to download a video from youtube.\n");
+        printf("Unfortunatly youtube downloading isn't supported because it requires browser cookies \nSadly only firefox allow to use cookies\n");
+        printf("If you wish to continue please ");
+        printf("If you have firefox installed AND have a youtube session in your cookies.");
+        scanf("%s",browser);
     }
 
-    printf("URL successfully registered\n");
+    printf("\nURL successfully registered\n");
 
     int format;
     do {
@@ -96,8 +76,8 @@ int main(void) {
         yt_dlp();
 
         snprintf(ffmpeg_cmd, sizeof(ffmpeg_cmd),
-                 "ffmpeg -i \"%s\\%s.mp4\" -vf \"fps=20,scale=480:-1:flags=lanczos,split[s0][s1];[s0]palettegen[p];[s1][p]paletteuse\" \"%s\\gif_%s.gif\"",
-                 folder_path, video_name, folder_path, video_name);
+        "ffmpeg -i \"%s\\%s.mp4\" -vf \"fps=20,scale=480:-1:flags=lanczos,split[s0][s1];[s0]palettegen[p];[s1][p]paletteuse\" \"%s\\gif_%s.gif\"",
+        folder_path, video_name, folder_path, video_name);
         system(ffmpeg_cmd);
 
         printf("Download complete\n");
@@ -106,8 +86,8 @@ int main(void) {
         char del_cmd[256];
         snprintf(del_cmd, sizeof(del_cmd), "del \"%s\\%s.mp4\"", folder_path, video_name);
         system(del_cmd);
-
+        
         printf("Temporary file deleted, Exiting program\n");
     }
     return 0;
-}   
+}
